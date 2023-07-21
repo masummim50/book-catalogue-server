@@ -1,6 +1,6 @@
 const app = require("./app");
 const mongoose = require("mongoose");
-const config = require('./config/index');
+const { config } = require("./config");
 const port = 5000;
 
 const bootstrap = async () => {

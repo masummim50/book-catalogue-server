@@ -1,10 +1,9 @@
-const { AuthServices } =  "./auth.services";
-const { sendResponse } = './../../shared/sendResponse';
+const AuthServices =  require("./auth.services");
+const sendResponse = require('./../../shared/sendResponse');
 
 const createUserController = async (req, res, next) => {
   try {
     const user = req.body;
-
     const newUser = await AuthServices.createUser(user);
     const { password, ...rest } = newUser._doc;
 

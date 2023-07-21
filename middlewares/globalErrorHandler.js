@@ -1,4 +1,5 @@
 
+const handleValidationError = require("../errors/handleValidationError")
 
 
 const globalErrorHandler = async (
@@ -49,4 +50,4 @@ const globalErrorHandler = async (
   });
 };
 
-export default globalErrorHandler;
+module.exports =  globalErrorHandler;

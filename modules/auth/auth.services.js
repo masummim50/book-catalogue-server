@@ -1,13 +1,14 @@
 const { bcryptFunctions } = "../../bcrypt/bcryptFunctions";
 const { jwtFunctions } = "./../../jwt/jwtFunctions";
+const userModel = require("../user/user.model")
 
 const createUser = async (user) => {
-  const newuser = await UserModel.create(user);
+  const newuser = await userModel.create(user);
   return newuser;
 };
 
 const loginUser = async (loginData) => {
-  const user = await UserModel.findOne({
+  const user = await userModel.findOne({
     email: loginData.email,
   });
   if (!user) {

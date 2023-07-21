@@ -1,4 +1,4 @@
-export const sendResponse = (res, statusCode, message, data, meta) => {
+const sendResponse = (res, statusCode, message, data, meta) => {
   const responseObj = {
     success: true,
     statusCode,
@@ -12,3 +12,5 @@ export const sendResponse = (res, statusCode, message, data, meta) => {
 
   res.status(statusCode).json(responseObj);
 };
+
+module.exports = sendResponse;

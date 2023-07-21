@@ -1,4 +1,5 @@
 const express = require('express');
+const globalErrorHandler = require('./middlewares/globalErrorHandler');
 const app = express();
 const bodyParser = require('body-parser');
 const { Routes } = require('./routes');
@@ -12,5 +13,8 @@ app.use(express.urlencoded({extended:true}))
 
 // Routes
 app.use('/api/v1', AuthRoutes); 
+
+
+app.use(globalErrorHandler)
 
 module.exports = app;

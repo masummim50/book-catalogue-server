@@ -1,6 +1,6 @@
-import jwt from 'jsonwebtoken';
-import config from '../../config';
-import mongoose from 'mongoose';
+const jwt = require('jsonwebtoken');
+const mongoose = require('mongoose');
+const { config } = require('../config');
 
 
 const generateAccessToken = (data) => {
@@ -25,7 +25,7 @@ const verifyRefreshToken = (token) => {
   return decodedToken;
 };
 
-export const jwtFunctions = {
+module.exports.jwtFunctions = {
   generateAccessToken,
   verifyAccessToken,
   generateRefreshToken,

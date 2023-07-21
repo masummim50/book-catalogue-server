@@ -1,4 +1,6 @@
-import mongoose from 'mongoose';
+const mongoose = require('mongoose');
+const bcryptFunctions = require('../../bcrypt/bcryptFunctions');
+const { jwtFunctions } = require('../../jwt/jwtFunctions');
 const { Schema } = mongoose;
 
 const userSchema = new Schema({
@@ -17,5 +19,8 @@ const userSchema = new Schema({
     timestamps:true
 });
 
-
-export const userModel = mongoose.model('User', bookSchema)
+userSchema.pre('save', async function() {
+  this.password = await bcryptFunctions.hashPassword(this.password);
+})
+const userModel = mongoose.model('User', userSchema)
+module.exports = userModel;
