@@ -1,6 +1,7 @@
-import { AuthServices } from "./auth.services";
+const { AuthServices } =  "./auth.services";
+const { sendResponse } = './../../shared/sendResponse';
 
-export const createUserController = async (req, res, next) => {
+const createUserController = async (req, res, next) => {
   try {
     const user = req.body;
 
@@ -26,33 +27,9 @@ const loginUserController = async (req, res, next) => {
   }
 };
 
-const generateNewAccessToken = async (req, res, next) => {
-  try {
-    const { refreshToken } = req.cookies;
-    if (refreshToken) {
-      const istokenVerified = await jwtFunctions.verifyRefreshToken(
-        refreshToken
-      );
-
-      if (istokenVerified) {
-        const newAccessToken = await jwtFunctions.generateAccessToken({
-          _id: istokenVerified._id,
-          role: istokenVerified.role,
-        });
-        sendResponse(res, 200, "new accesstoken generated successfully", {
-          accessToken: newAccessToken,
-        });
-      }
-    } else {
-      throw new ApiError(400, "refreshtoken not available");
-    }
-  } catch (error) {
-    next(error);
-  }
-};
-
-export const AuthController = {
+const AuthController = {
   createUserController,
   loginUserController,
-  generateNewAccessToken,
-};
+}
+
+module.exports= AuthController;

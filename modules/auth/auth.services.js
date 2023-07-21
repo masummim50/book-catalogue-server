@@ -1,38 +1,41 @@
+const { bcryptFunctions } = "../../bcrypt/bcryptFunctions";
+const { jwtFunctions } = "./../../jwt/jwtFunctions";
 
-
-export const createUser = async (user) => {
+const createUser = async (user) => {
   const newuser = await UserModel.create(user);
   return newuser;
 };
 
 const loginUser = async (loginData) => {
   const user = await UserModel.findOne({
-    phoneNumber: loginData.phoneNumber,
+    email: loginData.email,
   });
   if (!user) {
-    throw new ApiError(400, 'invalid credentials/user not found');
+    throw new ApiError(400, "invalid credentials/user not found");
   }
   const isPasswordMatched = await bcryptFunctions.matchPassword(
     loginData.password,
     user.password
   );
   if (!isPasswordMatched) {
-    throw new ApiError(400, 'invalid credentials');
+    throw new ApiError(400, "invalid credentials");
   }
 
   const accessToken = await jwtFunctions.generateAccessToken({
     _id: user._id,
-    role: user.role,
+    email: user.email,
   });
   const refreshToken = await jwtFunctions.generateRefreshToken({
     _id: user._id,
-    role: user.role,
+    email: user.email,
   });
 
   return { accessToken, refreshToken };
 };
 
-export const AuthServices = {
+const AuthServices = {
   createUser,
   loginUser,
 };
+
+module.exports = AuthServices;

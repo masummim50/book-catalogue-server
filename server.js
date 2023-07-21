@@ -1,6 +1,6 @@
 const app = require("./app");
 const mongoose = require("mongoose");
-const { config } = require("./config");
+const config = require('./config/index');
 const port = 5000;
 
 const bootstrap = async () => {
@@ -11,7 +11,7 @@ const bootstrap = async () => {
       console.log("app running on port ", port);
     });
   } catch (error) {
-    console.log("database connection error");
+    console.log("database connection error", error);
   }
 };
 
