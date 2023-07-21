@@ -1,0 +1,33 @@
+import jwt from 'jsonwebtoken';
+import config from '../../config';
+import mongoose from 'mongoose';
+
+
+const generateAccessToken = (data) => {
+  const accessToken = jwt.sign(data, config.jwt_secret_key, {
+    expiresIn: '2days',
+  });
+  return accessToken;
+};
+const generateRefreshToken = (data) => {
+  const refreshToken = jwt.sign(data, config.jwt_secret_key, {
+    expiresIn: '30day',
+  });
+  return refreshToken;
+};
+
+const verifyAccessToken = (token) => {
+  const decodedToken = jwt.verify(token, config.jwt_secret_key);
+  return decodedToken;
+};
+const verifyRefreshToken = (token) => {
+  const decodedToken = jwt.verify(token, config.jwt_secret_key);
+  return decodedToken;
+};
+
+export const jwtFunctions = {
+  generateAccessToken,
+  verifyAccessToken,
+  generateRefreshToken,
+  verifyRefreshToken,
+};
