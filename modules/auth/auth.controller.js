@@ -1,8 +1,10 @@
+import { AuthServices } from "./auth.services";
+
 export const createUserController = async (req, res, next) => {
   try {
     const user = req.body;
 
-    const newUser = await createUser(user);
+    const newUser = await AuthServices.createUser(user);
     const { password, ...rest } = newUser._doc;
 
     sendResponse(res, 200, "User created Successfully", rest);
