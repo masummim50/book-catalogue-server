@@ -5,6 +5,7 @@ const { checkAuth } = require("../../middlewares/authCheck");
 const BookRoutes = express.Router();
 
 BookRoutes.post("/book", checkAuth, BookController.createBook);
+BookRoutes.get("/books", BookController.getAllBooks);
 BookRoutes.post(
   "/book/wishlist/:id",
   checkAuth,

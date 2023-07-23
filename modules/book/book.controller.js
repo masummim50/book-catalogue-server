@@ -4,6 +4,16 @@ const userModel = require('../user/user.model');
 const sendResponse = require('./../../shared/sendResponse');
 const { bookModel } = require('./book.model');
 
+
+const getAllBooks = async(req, res, next)=> {
+    try {
+        const books = await bookModel.find({});
+        sendResponse(res, 200, "New book Added Successfully", books)
+    } catch (error) {
+        next(error)
+    }
+}
+
 const createBook = async(req, res, next)=> {
     try {
         const bookInfo = req.body;
@@ -87,7 +97,8 @@ const BookController = {
   deleteBookById,
   editBookById,
   addBookToWishlist,
-  addBookToReadingList
+  addBookToReadingList,
+  getAllBooks
 }
 
 module.exports= BookController;
