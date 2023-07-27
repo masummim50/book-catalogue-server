@@ -13,8 +13,8 @@ app.use(express.json());
 app.use(express.urlencoded({extended:true}))
 
 // Routes
+app.use('/api/v1', BookRoutes)
 app.use('/api/v1', AuthRoutes); 
-app.use('api/v1/', BookRoutes)
 
 
 app.use(globalErrorHandler)
