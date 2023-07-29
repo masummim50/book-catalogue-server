@@ -4,7 +4,7 @@ const { jwtFunctions } = require("../../jwt/jwtFunctions");
 const ApiError = require("../../errors/apiError");
 
 const createUserController = async (req, res, next) => {
-  console.log("create user controller")
+  
   try {
     const user = req.body;
     const newUser = await AuthServices.createUser(user);
@@ -33,7 +33,6 @@ const verifyAccessToken = async(req, res, next)=> {
   try {
     
     const token = req.headers.authorization.split(" ")[1];
-    console.log(token)
     const decoded = await jwtFunctions.verifyAccessToken(token);
     if(decoded){
       sendResponse(res, 200, "token valid", decoded)

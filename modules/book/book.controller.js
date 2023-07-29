@@ -8,7 +8,10 @@ const { bookModel } = require('./book.model');
 const getAllBooks = async(req, res, next)=> {
     console.log('getting all books')
     try {
-        const books = await bookModel.find({});
+        const books = await bookModel.find({}).populate({
+            path:"addedBy",
+            select:"name"
+        });
         sendResponse(res, 200, "New book Added Successfully", books)
     } catch (error) {
         next(error)
