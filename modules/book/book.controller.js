@@ -32,7 +32,10 @@ const createBook = async(req, res, next)=> {
 const getBookById = async(req, res, next)=> {
     try {
         const bookId = req.params.id;
-        const book = await bookModel.findById(bookId);
+        const book = await bookModel.findById(bookId).populate({path:"addedBy",select: "name "}).populate({path:"reviews._id", select: "name"});
+        if(!book){
+            throw new ApiError(404, "Book not found")
+        }
         sendResponse(res, 200, "Book Retrieved Successfully", book)
     } catch (error) {
         next(error)
@@ -95,6 +98,23 @@ const addBookToReadingList = async (req, res, next)=> {
         next(error)
     }
 }
+
+const addReview = async (req, res, next)=> {
+    try {
+        const bookId = req.params.id;
+        const review = {_id:req.user._id, ...req.body};
+        const updateBookReview = await bookModel.findOneAndUpdate({_id:bookId}, {$push: {reviews: review}})
+        if(updateBookReview){
+            sendResponse(res, 200, "Review Posted Successfully")
+        }else{
+            throw new ApiError(400, "something went wrong to post Review")
+        }
+    } catch (error) {
+        next(error)
+    }
+}
+
+
 const BookController = {
   createBook,
   getBookById,
@@ -102,7 +122,8 @@ const BookController = {
   editBookById,
   addBookToWishlist,
   addBookToReadingList,
-  getAllBooks
+  getAllBooks,
+  addReview
 }
 
 module.exports= BookController;
