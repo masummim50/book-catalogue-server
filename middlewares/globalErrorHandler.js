@@ -17,12 +17,7 @@ const globalErrorHandler = async (
     statusCode = simplifiedError.statusCode;
     message = simplifiedError.message;
     errorMessages = simplifiedError.errorMessages;
-  } else if (error?.name === 'CastError') {
-    const simplifiedError = handleCastError(error);
-    statusCode = simplifiedError.statusCode;
-    message = simplifiedError.message;
-    errorMessages = simplifiedError.errorMessages;
-  } else if (error instanceof ApiError) {
+  }  else if (error instanceof ApiError) {
     message = error?.message;
     statusCode = error?.statusCode;
     errorMessages = [

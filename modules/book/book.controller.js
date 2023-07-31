@@ -32,7 +32,7 @@ const createBook = async(req, res, next)=> {
 const getBookById = async(req, res, next)=> {
     try {
         const bookId = req.params.id;
-        const book = await bookModel.findById(bookId).populate({path:"addedBy",select: "name "}).populate({path:"reviews._id", select: "name"});
+        const book = await bookModel.findById(bookId).populate({path:"addedBy",select: "name "}).populate({path:"reviews.user", select: "name"});
         if(!book){
             throw new ApiError(404, "Book not found")
         }
@@ -102,10 +102,12 @@ const addBookToReadingList = async (req, res, next)=> {
 const addReview = async (req, res, next)=> {
     try {
         const bookId = req.params.id;
-        const review = {_id:req.user._id, ...req.body};
-        const updateBookReview = await bookModel.findOneAndUpdate({_id:bookId}, {$push: {reviews: review}})
+        console.log("req body", req.body)
+        const review = {user:req.user._id, ...req.body};
+        console.log("review", review)
+        const updateBookReview = await bookModel.findOneAndUpdate({_id:bookId}, {$push: {reviews: review}}, {new:true}).populate({path: "reviews.user", select:"name"})
         if(updateBookReview){
-            sendResponse(res, 200, "Review Posted Successfully")
+            sendResponse(res, 200, "Review Posted Successfully", updateBookReview)
         }else{
             throw new ApiError(400, "something went wrong to post Review")
         }

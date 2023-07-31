@@ -18,7 +18,7 @@ BookRoutes.post(
   );
 BookRoutes.delete("/book/:id", checkAuth, BookController.deleteBookById);
 BookRoutes.patch("/book/:id", checkAuth, BookController.editBookById);
-BookRoutes.get("/book/:id", checkAuth, BookController.getBookById);
+BookRoutes.get("/book/:id", BookController.getBookById);
 BookRoutes.post("/book/review/:id", checkAuth, BookController.addReview)
 
 module.exports = BookRoutes;

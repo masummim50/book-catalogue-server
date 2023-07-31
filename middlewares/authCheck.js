@@ -1,3 +1,4 @@
+const ApiError = require("../errors/apiError");
 const { jwtFunctions } = require("../jwt/jwtFunctions");
 
 
