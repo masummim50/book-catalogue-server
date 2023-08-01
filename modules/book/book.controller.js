@@ -32,7 +32,7 @@ const createBook = async(req, res, next)=> {
 const getBookById = async(req, res, next)=> {
     try {
         const bookId = req.params.id;
-        const book = await bookModel.findById(bookId).populate({path:"addedBy",select: "name "}).populate({path:"reviews.user", select: "name"});
+        const book = await bookModel.findById(bookId).populate({path:"addedBy",select: "name"}).populate({path:"reviews.user", select: "name"});
         if(!book){
             throw new ApiError(404, "Book not found")
         }
