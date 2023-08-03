@@ -1,121 +1,173 @@
+const ApiError = require("../../errors/apiError");
+const userModel = require("../user/user.model");
+const sendResponse = require("./../../shared/sendResponse");
+const { bookModel } = require("./book.model");
 
-const ApiError = require('../../errors/apiError');
-const userModel = require('../user/user.model');
-const sendResponse = require('./../../shared/sendResponse');
-const { bookModel } = require('./book.model');
+const getAllBooks = async (req, res, next) => {
+  console.log("getting all books");
+  try {
+    const books = await bookModel.find({}).populate({
+      path: "addedBy",
+      select: "name",
+    });
+    sendResponse(res, 200, "New book Added Successfully", books);
+  } catch (error) {
+    next(error);
+  }
+};
 
+const createBook = async (req, res, next) => {
+  try {
+    const bookInfo = req.body;
+    const bookObj = { ...bookInfo, addedBy: req.user._id };
+    const newBook = await bookModel.create(bookObj);
+    sendResponse(res, 200, "New book Added Successfully", newBook);
+  } catch (error) {
+    next(error);
+  }
+};
 
-const getAllBooks = async(req, res, next)=> {
-    console.log('getting all books')
-    try {
-        const books = await bookModel.find({}).populate({
-            path:"addedBy",
-            select:"name"
-        });
-        sendResponse(res, 200, "New book Added Successfully", books)
-    } catch (error) {
-        next(error)
+const getBookById = async (req, res, next) => {
+  try {
+    const bookId = req.params.id;
+    const book = await bookModel
+      .findById(bookId)
+      .populate({ path: "addedBy", select: "name" })
+      .populate({ path: "reviews.user", select: "name" });
+    if (!book) {
+      throw new ApiError(404, "Book not found");
     }
-}
+    sendResponse(res, 200, "Book Retrieved Successfully", book);
+  } catch (error) {
+    next(error);
+  }
+};
+const deleteBookById = async (req, res, next) => {
+  try {
+    const bookId = req.params.id;
+    const book = await bookModel.findOneAndDelete(
+      { _id: bookId, addedBy: req.user._id },
+      { new: true }
+    );
+    if (book) {
+      sendResponse(res, 200, "Book Deleted Successfully", book);
+    } else {
+      throw new ApiError(
+        400,
+        "book does not exist or you are not authorize to delete this book"
+      );
+    }
+  } catch (error) {
+    next(error);
+  }
+};
 
-const createBook = async(req, res, next)=> {
-    try {
-        const bookInfo = req.body;
-        const bookObj = {...bookInfo, addedBy:req.user._id};
-        const newBook = await bookModel.create(bookObj);
-        sendResponse(res, 200, "New book Added Successfully", newBook)
-    } catch (error) {
-        next(error)
-    }
-}
+const editBookById = async (req, res, next) => {
+  try {
+    const bookId = req.params.id;
+    const update = req.body;
+    const book = await bookModel.findOneAndUpdate(
+      { _id: bookId, addedBy: req.user._id },
+      update,
+      { new: true }
+    );
 
-const getBookById = async(req, res, next)=> {
-    try {
-        const bookId = req.params.id;
-        const book = await bookModel.findById(bookId).populate({path:"addedBy",select: "name"}).populate({path:"reviews.user", select: "name"});
-        if(!book){
-            throw new ApiError(404, "Book not found")
-        }
-        sendResponse(res, 200, "Book Retrieved Successfully", book)
-    } catch (error) {
-        next(error)
+    if (book) {
+      sendResponse(res, 200, "Book updated Successfully", book);
+    } else {
+      throw new ApiError(
+        400,
+        "book does not exist or you are not authorize to update this book"
+      );
     }
-}
-const deleteBookById = async(req, res, next)=> {
-    try {
-        const bookId = req.params.id;
-        const book = await bookModel.findOneAndDelete({_id:bookId, addedBy: req.user._id}, {new:true});
-        if(book){
-            sendResponse(res, 200, "Book Deleted Successfully", book)
-        }else{
-            throw new ApiError(400, "book does not exist or you are not authorize to delete this book")
-        }
-        
-    } catch (error) {
-        next(error)
-    }
-}
+  } catch (error) {
+    next(error);
+  }
+};
 
-const editBookById = async(req, res, next)=> {
-    try {
-        const bookId = req.params.id;
-        const update = req.body;
-        const book = await bookModel.findOneAndUpdate({_id:bookId, addedBy:req.user._id}, update, {new:true});
-        
-        if(book){
-            sendResponse(res, 200, "Book updated Successfully", book)
-        }else{
-            throw new ApiError(400, "book does not exist or you are not authorize to update this book")
-        }
-    } catch (error) {
-        next(error)
+const addBookToWishlist = async (req, res, next) => {
+  try {
+    const bookId = req.params.id;
+    const updatedUser = await userModel.updateOne(
+      { _id: req.user._id },
+      { $push: { wishlist: bookId } }
+    );
+    if (updatedUser) {
+      sendResponse(res, 200, "Book Added to Wishlist Successfully");
+    } else {
+      throw new ApiError(
+        400,
+        "something went wrong adding the book to wishlist"
+      );
     }
-}
+  } catch (error) {
+    next(error);
+  }
+};
+const addBookToReadingList = async (req, res, next) => {
+  try {
+    const bookId = req.params.id;
+    const updatedUser = await userModel.updateOne(
+      { _id: req.user._id },
+      { $push: { reading: bookId } }
+    );
+    if (updatedUser) {
+      sendResponse(res, 200, "Book Added to Reading List Successfully");
+    } else {
+      throw new ApiError(
+        400,
+        "something went wrong adding the book to Reading List"
+      );
+    }
+  } catch (error) {
+    next(error);
+  }
+};
 
-const addBookToWishlist = async (req, res, next)=> {
-    try {
-        const bookId = req.params.id;
-        const updatedUser = await userModel.updateOne({_id:req.user._id}, {$push: {wishlist: bookId}});
-        if(updatedUser){
-            sendResponse(res, 200, "Book Added to Wishlist Successfully")
-        }else{
-            throw new ApiError(400, "something went wrong adding the book to wishlist")
-        }
-    } catch (error) {
-        next(error)
+const addReview = async (req, res, next) => {
+  try {
+    const bookId = req.params.id;
+    console.log("req body", req.body);
+    const review = { user: req.user._id, ...req.body };
+    console.log("review", review);
+    const updateBookReview = await bookModel
+      .findOneAndUpdate(
+        { _id: bookId },
+        { $push: { reviews: review } },
+        { new: true }
+      )
+      .populate({ path: "reviews.user", select: "name" }).populate({path:"addedBy", select:"name"});
+    if (updateBookReview) {
+      sendResponse(res, 200, "Review Posted Successfully", updateBookReview);
+    } else {
+      throw new ApiError(400, "something went wrong to post Review");
     }
-}
-const addBookToReadingList = async (req, res, next)=> {
-    try {
-        const bookId = req.params.id;
-        const updatedUser = await userModel.updateOne({_id:req.user._id}, {$push: {reading: bookId}});
-        if(updatedUser){
-            sendResponse(res, 200, "Book Added to Reading List Successfully")
-        }else{
-            throw new ApiError(400, "something went wrong adding the book to Reading List")
-        }
-    } catch (error) {
-        next(error)
-    }
-}
+  } catch (error) {
+    next(error);
+  }
+};
 
-const addReview = async (req, res, next)=> {
-    try {
-        const bookId = req.params.id;
-        console.log("req body", req.body)
-        const review = {user:req.user._id, ...req.body};
-        console.log("review", review)
-        const updateBookReview = await bookModel.findOneAndUpdate({_id:bookId}, {$push: {reviews: review}}, {new:true}).populate({path: "reviews.user", select:"name"})
-        if(updateBookReview){
-            sendResponse(res, 200, "Review Posted Successfully", updateBookReview)
-        }else{
-            throw new ApiError(400, "something went wrong to post Review")
-        }
-    } catch (error) {
-        next(error)
+const editReview = async (req, res, next) => {
+  try {
+      const bookId = req.params.id;
+      const review = { user: req.user._id, ...req.body };
+      const updatedReviewData = { user: req.user._id, review: req.body.review }; 
+    const updateBookReview = await bookModel
+      .findOneAndUpdate(
+        { _id: bookId, "reviews._id": req.body._id },
+        { $set: { "reviews.$.user": updatedReviewData.user, "reviews.$.review": updatedReviewData.review } },
+        { new: true }
+      )
+      .populate({ path: "reviews.user", select: "name" }).populate({path:"addedBy", select:"name"});
+    if (updateBookReview) {
+      sendResponse(res, 200, "Review updated Successfully", updateBookReview);
+    } else {
+      throw new ApiError(400, "something went wrong to post Review");
     }
-}
-
+  } catch (error) {
+    next(error);
+  }
+};
 
 const BookController = {
   createBook,
@@ -125,7 +177,8 @@ const BookController = {
   addBookToWishlist,
   addBookToReadingList,
   getAllBooks,
-  addReview
-}
+  addReview,
+  editReview,
+};
 
-module.exports= BookController;
+module.exports = BookController;
