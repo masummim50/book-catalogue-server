@@ -4,7 +4,7 @@ const { jwtFunctions } = require('../../jwt/jwtFunctions');
 const { Schema } = mongoose;
 
 const userSchema = new Schema({
-  email: {type: String, required:true}, 
+  email: {type: String, required:true, unique:true, index:true}, 
   password: {type: String, required:true},
   name: {type: String, required:true},
   books: [{

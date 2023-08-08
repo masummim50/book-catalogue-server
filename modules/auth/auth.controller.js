@@ -12,7 +12,7 @@ const createUserController = async (req, res, next) => {
 
     sendResponse(res, 200, "User created Successfully", rest);
   } catch (error) {
-    next(error);
+      next(error);
   }
 };
 

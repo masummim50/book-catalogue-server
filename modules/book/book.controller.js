@@ -16,6 +16,48 @@ const getAllBooks = async (req, res, next) => {
   }
 };
 
+const getRecentBooks = async (req, res, next) => {
+  console.log("getting recent books");
+  try {
+    const books = await bookModel.find({}).sort({createdAt:-1}).limit(20).populate({
+      path: "addedBy",
+      select: "name",
+    });
+    sendResponse(res, 200, "New book Added Successfully", books);
+  } catch (error) {
+    next(error);
+  }
+};
+const getYears = async(req, res, next)=> {
+  try {
+    const uniqueYears = await bookModel.aggregate([
+      {
+        $project: {
+          _id: 0, // Exclude the default _id field from the output
+          year: { $year: '$date' }, // Extract the year part from the date field
+        },
+      },
+      {
+        $group: {
+          _id: '$year', // Group by the extracted year
+        },
+      },
+      {
+        $project: {
+          _id: 0, // Exclude the default _id field from the output
+          year: '$_id', // Rename the _id field as 'year' in the output
+        },
+      },
+    ]);
+
+    sendResponse(res, 200, "years", uniqueYears)
+  } catch (error) {
+    // Handle the error
+    console.error('Error while fetching unique years:', error);
+    throw error;
+  }
+}
+
 const createBook = async (req, res, next) => {
   try {
     const bookInfo = req.body;
@@ -86,11 +128,55 @@ const editBookById = async (req, res, next) => {
 };
 
 const addBookToWishlist = async (req, res, next) => {
+  
+  console.log(req.params.id, "adding")
   try {
     const bookId = req.params.id;
     const updatedUser = await userModel.updateOne(
       { _id: req.user._id },
-      { $push: { wishlist: bookId } }
+      { $push: { "wishlist": {_id: bookId} } }
+    );
+    if (updatedUser) {
+      sendResponse(res, 200, "Book Added to Wishlist Successfully");
+    } else {
+      throw new ApiError(
+        400,
+        "something went wrong adding the book to wishlist"
+      );
+    }
+  } catch (error) {
+    next(error);
+  }
+};
+const removeBookFromWishlist = async (req, res, next) => {
+  
+  console.log(req.params.id, "remove category")
+  try {
+    const bookId = req.params.id;
+    const updatedUser = await userModel.updateOne(
+      { _id: req.user._id },
+      { $pull: { wishlist: {_id:bookId} } }
+    );
+    if (updatedUser) {
+      sendResponse(res, 200, "Book Added to Wishlist Successfully");
+    } else {
+      throw new ApiError(
+        400,
+        "something went wrong adding the book to wishlist"
+      );
+    }
+  } catch (error) {
+    next(error);
+  }
+};
+const removeBookFromReadingLIst = async (req, res, next) => {
+  
+  console.log(req.params.id, "remove category")
+  try {
+    const bookId = req.params.id;
+    const updatedUser = await userModel.updateOne(
+      { _id: req.user._id },
+      { $pull: { reading: {_id:bookId} } }
     );
     if (updatedUser) {
       sendResponse(res, 200, "Book Added to Wishlist Successfully");
@@ -105,11 +191,12 @@ const addBookToWishlist = async (req, res, next) => {
   }
 };
 const addBookToReadingList = async (req, res, next) => {
+  console.log("reading list", req.params.id)
   try {
     const bookId = req.params.id;
     const updatedUser = await userModel.updateOne(
       { _id: req.user._id },
-      { $push: { reading: bookId } }
+      { $push: { "reading": {_id:bookId} } }
     );
     if (updatedUser) {
       sendResponse(res, 200, "Book Added to Reading List Successfully");
@@ -169,6 +256,29 @@ const editReview = async (req, res, next) => {
   }
 };
 
+const deleteReview = async (req, res, next) => {
+  try {
+    const bookId = req.params.id;
+    const reviewId = req.body._id;
+
+    const updateBookReview = await bookModel.findOneAndUpdate(
+      { _id: bookId },
+      { $pull: { reviews: { _id: reviewId, user: req.user._id } } },
+      { new: true }
+    )
+    .populate({ path: "reviews.user", select: "name" })
+    .populate({ path: "addedBy", select: "name" });
+
+    if (updateBookReview) {
+      sendResponse(res, 200, "Review deleted Successfully", updateBookReview);
+    } else {
+      throw new ApiError(400, "Failed to delete Review");
+    }
+  } catch (error) {
+    next(error);
+  }
+};
+
 const BookController = {
   createBook,
   getBookById,
@@ -179,6 +289,11 @@ const BookController = {
   getAllBooks,
   addReview,
   editReview,
+  deleteReview,
+  removeBookFromWishlist,
+  removeBookFromReadingLIst,
+  getRecentBooks,
+  getYears
 };
 
 module.exports = BookController;

@@ -6,6 +6,7 @@ const { Routes } = require('./routes');
 const cors = require('cors');
 const AuthRoutes = require('./modules/auth/auth.route');
 const BookRoutes = require('./modules/book/book.route');
+const UserRoutes = require('./modules/user/user.route');
 
 // Middleware
 app.use(cors())
@@ -15,6 +16,7 @@ app.use(express.urlencoded({extended:true}))
 // Routes
 app.use('/api/v1', BookRoutes)
 app.use('/api/v1', AuthRoutes); 
+app.use("/api/v1", UserRoutes)
 
 
 app.use(globalErrorHandler)
