@@ -76,7 +76,7 @@ const getYears = async(req, res, next)=> {
           year: '$_id', // Rename the _id field as 'year' in the output
         },
       },
-    ]);
+    ]).sort("1");
 
     sendResponse(res, 200, "years", uniqueYears)
   } catch (error) {
