@@ -28,6 +28,34 @@ const getRecentBooks = async (req, res, next) => {
     next(error);
   }
 };
+
+const getSearchedBooks = async(req, res, next)=> {
+  try {
+    const searchtext = req.params.searchtext;
+    console.log(searchtext);
+    const searchWords = searchtext.split(/\s+/); // Split search text into individual words
+  const regexArray = searchWords.map(word => new RegExp(`\\b${word}\\b`, 'i')); // Create an array of case-insensitive regexes
+
+  const result = await bookModel.aggregate([
+    {
+      $match: {
+        $or: [
+          { title: { $in: regexArray } },
+          { author: { $in: regexArray } },
+          { genre: { $in: regexArray } }
+        ]
+      }
+    }
+  ]);
+  console.log(result);
+  sendResponse(res, 200, "Searched Books retrieved Successfully", result);
+
+  } catch (error) {
+    next(error)
+  }
+}
+
+
 const getYears = async(req, res, next)=> {
   try {
     const uniqueYears = await bookModel.aggregate([
@@ -293,7 +321,8 @@ const BookController = {
   removeBookFromWishlist,
   removeBookFromReadingLIst,
   getRecentBooks,
-  getYears
+  getYears,
+  getSearchedBooks
 };
 
 module.exports = BookController;

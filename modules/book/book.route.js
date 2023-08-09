@@ -8,6 +8,7 @@ BookRoutes.post("/book", checkAuth, BookController.createBook);
 BookRoutes.get("/books", BookController.getAllBooks);
 BookRoutes.get("/books/recent", BookController.getRecentBooks)
 BookRoutes.get("/books/years", BookController.getYears)
+BookRoutes.get("/books/search/:searchtext", BookController.getSearchedBooks)
 BookRoutes.patch(
   "/book/wishlist/:id",
   checkAuth,
