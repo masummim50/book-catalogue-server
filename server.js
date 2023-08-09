@@ -5,7 +5,7 @@ const port = 5000;
 
 const bootstrap = async () => {
   try {
-    await mongoose.connect(config.database_url);
+    await mongoose.connect(config.database_url_online);
     console.log("database connected");
     app.listen(port, () => {
       console.log("app running on port ", port);

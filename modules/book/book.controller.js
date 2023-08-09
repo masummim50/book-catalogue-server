@@ -4,7 +4,6 @@ const sendResponse = require("./../../shared/sendResponse");
 const { bookModel } = require("./book.model");
 
 const getAllBooks = async (req, res, next) => {
-  console.log("getting all books");
   try {
     const books = await bookModel.find({}).populate({
       path: "addedBy",
@@ -17,7 +16,6 @@ const getAllBooks = async (req, res, next) => {
 };
 
 const getRecentBooks = async (req, res, next) => {
-  console.log("getting recent books");
   try {
     const books = await bookModel.find({}).sort({createdAt:-1}).limit(20).populate({
       path: "addedBy",
@@ -32,7 +30,6 @@ const getRecentBooks = async (req, res, next) => {
 const getSearchedBooks = async(req, res, next)=> {
   try {
     const searchtext = req.params.searchtext;
-    console.log(searchtext);
     const searchWords = searchtext.split(/\s+/); // Split search text into individual words
   const regexArray = searchWords.map(word => new RegExp(`\\b${word}\\b`, 'i')); // Create an array of case-insensitive regexes
 
@@ -47,7 +44,6 @@ const getSearchedBooks = async(req, res, next)=> {
       }
     }
   ]);
-  console.log(result);
   sendResponse(res, 200, "Searched Books retrieved Successfully", result);
 
   } catch (error) {
@@ -157,7 +153,6 @@ const editBookById = async (req, res, next) => {
 
 const addBookToWishlist = async (req, res, next) => {
   
-  console.log(req.params.id, "adding")
   try {
     const bookId = req.params.id;
     const updatedUser = await userModel.updateOne(
@@ -178,7 +173,6 @@ const addBookToWishlist = async (req, res, next) => {
 };
 const removeBookFromWishlist = async (req, res, next) => {
   
-  console.log(req.params.id, "remove category")
   try {
     const bookId = req.params.id;
     const updatedUser = await userModel.updateOne(
@@ -199,7 +193,6 @@ const removeBookFromWishlist = async (req, res, next) => {
 };
 const removeBookFromReadingLIst = async (req, res, next) => {
   
-  console.log(req.params.id, "remove category")
   try {
     const bookId = req.params.id;
     const updatedUser = await userModel.updateOne(
@@ -219,7 +212,6 @@ const removeBookFromReadingLIst = async (req, res, next) => {
   }
 };
 const addBookToReadingList = async (req, res, next) => {
-  console.log("reading list", req.params.id)
   try {
     const bookId = req.params.id;
     const updatedUser = await userModel.updateOne(
@@ -242,9 +234,7 @@ const addBookToReadingList = async (req, res, next) => {
 const addReview = async (req, res, next) => {
   try {
     const bookId = req.params.id;
-    console.log("req body", req.body);
     const review = { user: req.user._id, ...req.body };
-    console.log("review", review);
     const updateBookReview = await bookModel
       .findOneAndUpdate(
         { _id: bookId },
